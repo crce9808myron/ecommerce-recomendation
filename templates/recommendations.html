@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <title>Recommendations</title>
+</head>
+<body>
+    <header>
+        <h1>Recommended Products for You</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('product_list') }}">Products</a></li>
+                <li><a href="{{ url_for('cart') }}">Cart</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="recommendations">
+            <h2>Your Recommendations</h2>
+            <div class="product-grid">
+                {% if recommendations %}
+                    {% for product in recommendations %}
+                        <div class="product-card">
+                            <img src="{{ product.image_url }}" alt="{{ product.product_name }}">
+                            <h3>{{ product.product_name }}</h3>
+                            <p>Price: ${{ product.price }}</p>
+                            <a class="btn" href="{{ url_for('product_detail', product_id=product._id) }}">View Product</a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No recommendations available at this time.</p>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2024 Your E-commerce Website. All rights reserved.</p>
+    </footer>
+</body>
+</html>

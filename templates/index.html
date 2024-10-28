@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - E-commerce</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <h1>My E-Commerce Site</h1>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('add_product') }}">Add Product</a></li>
+                    <li><a href="{{ url_for('product_list') }}">Products</a></li>
+                    <li><a href="{{ url_for('cart') }}">Cart</a></li>
+                    {% if 'user_id' in session %}
+                        <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                        <li><a href="{{ url_for('register') }}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Welcome to Our Online Store</h2>
+            <p>Your one-stop shop for all your needs!</p>
+            <a href="{{ url_for('product_list') }}" class="btn shop-now">Shop Now</a>
+        </section>
+
+        <section class="recommended-products">
+            <h2>Recommended Products</h2>
+            <div class="product-grid">
+                {% for product in recommendations %}
+                <div class="product-card">
+                    <img src="{{ product['image_url'] }}" alt="{{ product['product_name'] }}">
+                    <h3>{{ product['product_name'] }}</h3>
+                    <p>Price: ${{ product['price'] }}</p>
+                    <a href="{{ url_for('product_detail', product_id=product['_id']) }}" class="btn">View Details</a>
+                    <button class="btn" onclick="addToCart('{{ product._id }}')">Add to Cart</button>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 My E-Commerce Site</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <h1>Add New Product</h1>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('product_list') }}">Products</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="form-section">
+            <h2>Product Details</h2>
+            <form method="POST" action="{{ url_for('add_product') }}">
+                <div>
+                    <label for="product_name">Product Name:</label>
+                    <input type="text" name="product_name" id="product_name" required>
+                </div>
+                <div>
+                    <label for="price">Price:</label>
+                    <input type="number" name="price" id="price" step="0.01" required>
+                </div>
+                <div>
+                    <label for="image_url">Image URL:</label>
+                    <input type="text" name="image_url" id="image_url" required>
+                </div>
+                <div>
+                    <label for="tags">Tags (comma-separated):</label>
+                    <input type="text" name="tags" id="tags" required>
+                </div>
+                <div>
+                    <label for="description">Description:</label>
+                    <textarea name="description" id="description" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn">Add Product</button>
+            </form>
+            {% if success %}
+                <p class="success-message">Product added successfully!</p>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 My E-Commerce Site</p>
+    </footer>
+</body>
+</html>

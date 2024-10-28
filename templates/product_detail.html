@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.product_name }} - Product Detail</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('cart') }}">Cart</a></li>
+            {% if session.user_id %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('register') }}">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Product Detail Section -->
+    <section class="product-detail">
+        <img src="{{ product.image_url }}" alt="{{ product.product_name }}" class="product-image">
+        <h1>{{ product.product_name }}</h1>
+        <p>{{ product.description }}</p>
+        <p>Price: ${{ product.price }}</p>
+        <button class="btn" onclick="addToCart('{{ product._id }}')">Add to Cart</button>
+    </section>
+
+    <!-- Related Products (Recommendations) -->
+    <section class="recommendation">
+        <h2>Similar Products</h2>
+        <div class="recommended-products">
+            {% for product in recommendations %}
+                <div class="product-card">
+                    <img src="{{ product.image_url }}" alt="{{ product.product_name }}">
+                    <h3>{{ product.product_name }}</h3>
+                    <p>Price: ${{ product.price }}</p>
+                    <a class="btn" href="{{ url_for('product_detail', product_id=product._id) }}">View Product</a>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 E-Commerce Website</p>
+    </footer>
+</body>
+</html>
