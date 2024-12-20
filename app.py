@@ -186,63 +186,71 @@ def checkout():
 
             flash('Order placed successfully!', 'success')
             return redirect(url_for('index'))
+
         else:
             flash('Your cart is empty!', 'warning')
-            return redirect(url_for('cart'))
 
-    cart_items = []
-    total_price = 0
-    if 'user_id' in session:
-        user_cart = mongo.db.users.find_one({"_id": ObjectId(session['user_id'])}).get('cart', [])
-        cart_items = list(mongo.db.products.find({"_id": {"$in": [ObjectId(item) for item in user_cart]}}))
-        total_price = sum(item['price'] for item in cart_items)
-
-    recommendations = fetch_recommendations(session['user_id']) if 'user_id' in session else []
-    return render_template('checkout.html', cart_items=cart_items, total_price=total_price, recommendations=recommendations)
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        password = request.form['password']
-
-        if not verify_password(password):
-            return 'Password does not meet the complexity requirements'
-
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-        mongo.db.users.insert_one({
-            "name": name,
-            "email": email,
-            "password": hashed_password,
-            "cart": [],
-            "purchased_products": []
-        })
-
-        return redirect(url_for('login'))
-
-    return render_template('register.html')
+    return render_template('checkout.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
+        username = request.form['username']
         password = request.form['password']
 
-        user = mongo.db.users.find_one({"email": email})
-        if user and bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
+        user = mongo.db.users.find_one({"username": username})
+        if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
             session['user_id'] = str(user['_id'])
+            flash('Login successful!', 'success')
             return redirect(url_for('index'))
         else:
-            return 'Login failed. Check your credentials.'
+            flash('Invalid username or password.', 'danger')
 
     return render_template('login.html')
+
+@app.route('/rate_product/<product_id>', methods=['POST'])
+def rate_product(product_id):
+    if 'user_id' not in session:
+        flash('You need to log in to rate a product.', 'warning')
+        return redirect(url_for('login'))
+
+    rating = request.form.get('rating')
+    if not rating or not rating.isdigit() or not (1 <= int(rating) <= 5):
+        flash('Invalid rating. Please provide a rating between 1 and 5.', 'danger')
+        return redirect(url_for('product_detail', product_id=product_id))
+
+    user_id = session['user_id']
+    submit_rating(user_id, product_id, int(rating))
+    flash('Thank you for rating this product!', 'success')
+    return redirect(url_for('product_detail', product_id=product_id))
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+
+        if password != confirm_password:
+            flash('Passwords do not match.', 'warning')
+        elif not verify_password(password):
+            flash('Password does not meet the security requirements.', 'warning')
+        else:
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            user = {"username": username, "password": hashed_password, "cart": [], "purchased_products": []}
+            try:
+                mongo.db.users.insert_one(user)
+                flash('Registration successful! You can now log in.', 'success')
+                return redirect(url_for('login'))
+            except:
+                flash('Username already exists.', 'danger')
+
+    return render_template('register.html')
 
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
-    flash('You have been logged out', 'success')
+    flash('You have been logged out.', 'info')
     return redirect(url_for('index'))
 
 @app.route('/profile', methods=['GET', 'POST'])
